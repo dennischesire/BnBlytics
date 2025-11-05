@@ -149,6 +149,17 @@ def fallback_price(v):
 # ----------------- UI -----------------
 st.title("🏠 Cape Town Airbnb — Price Predictor")
 st.markdown("**Data-driven pricing intelligence for optimal revenue**")
+st.markdown("""
+### Welcome to BnBlytics 🌍
+BnBlytics helps you **predict Airbnb nightly prices** based on property details like the number of bedrooms, bathrooms, and amenities.
+
+This tool empowers **hosts and investors** to make data-driven decisions — whether you're optimizing pricing or exploring new markets.
+
+💡 *Built with machine learning, using Cape Town Airbnb data — and now tailored for Kenya's hospitality insights!*
+
+🇰🇪 **New Update:** Kenyan Shilling (KSh) pricing and localized insights for East African markets.
+""")
+
 
 # Quick stats bar
 col1, col2, col3, col4 = st.columns(4)
@@ -180,8 +191,6 @@ ngh = st.sidebar.selectbox("Neighbourhood", get_unique_values('neighbourhood_cle
 # Show premium indicator
 if ngh in INSIGHTS["premium_areas"]:
     st.sidebar.success("⭐ Premium Location")
-lat = st.sidebar.number_input("Latitude", value=-33.9258, format="%.6f")
-lon = st.sidebar.number_input("Longitude", value=18.4232, format="%.6f")
 
 st.sidebar.subheader("👤 Host Profile")
 hlc = st.sidebar.slider("Host Listings", 0, 200, 2)
@@ -204,12 +213,13 @@ ib = st.sidebar.selectbox("Instant Book", ['No','Yes'])
 
 vals = dict(
     property_type=pt, room_type=rt, neighbourhood=ngh, accommodates=accom,
-    bedrooms=bedr, beds=beds, bathrooms=bthr, latitude=lat, longitude=lon,
+    bedrooms=bedr, beds=beds, bathrooms=bthr,
     host_listings_count=hlc, host_acceptance_rate=har, hosting_years=hyrs,
     host_is_superhost=sh, review_scores_rating=rsr, review_scores_location=rsl,
     number_of_reviews=nrev, amenities_count=amen_ct, has_pool=pool,
     has_bbq_grill=bbq, has_ocean_view=view, has_hot_tub=tub, instant_bookable=ib
 )
+
 
 # Main actions
 col_left, col_right = st.columns([2,1])
@@ -222,7 +232,7 @@ with col_left:
         if model is None:
             st.error(f"Model not loaded: {load_err or 'unknown error'}")
             price = fallback_price(vals)
-            st.metric("Estimated Price (Fallback)", f"R {price:,.0f}")
+            st.metric("Estimated Price (Fallback)", f"Ksh{price:,.0f}")
         else:
             try:
                 ex = expected_features(model)
@@ -231,8 +241,8 @@ with col_left:
                 low, high = price_band(price, 15)
 
                 # Main price display
-                st.metric("Recommended Nightly Price", f"R {price:,.0f}")
-                st.caption("Confidence Range (±15%): R {:,.0f} – R {:,.0f}".format(low, high))
+                st.metric("Recommended Nightly Price", f"Ksh {price:,.0f}")
+                st.caption("Confidence Range (±15%): Ksh {:,.0f} – Ksh {:,.0f}".format(low, high))
 
                 # Revenue projections
                 st.subheader("📈 Revenue Projections")
@@ -242,9 +252,9 @@ with col_left:
                 
                 rev1, rev2 = st.columns(2)
                 with rev1:
-                    st.metric("Monthly Revenue", f"R {monthly:,.0f}")
+                    st.metric("Monthly Revenue", f"Ksh {monthly:,.0f}")
                 with rev2:
-                    st.metric("Annual Revenue", f"R {annual:,.0f}")
+                    st.metric("Annual Revenue", f"Ksh {annual:,.0f}")
 
                 # Quick insights based on inputs
                 with st.expander("💡 Quick Insights", expanded=True):
@@ -262,7 +272,7 @@ with col_left:
             except Exception as e:
                 st.error(f"Prediction failed: {e}")
                 price = fallback_price(vals)
-                st.metric("Estimated Price (Fallback)", f"R {price:,.0f}")
+                st.metric("Estimated Price (Fallback)", f"Ksh {price:,.0f}")
 
 with col_right:
     st.subheader("🔬 Model Intelligence")
@@ -274,7 +284,7 @@ with col_right:
         st.metric("R² Score", f"{INSIGHTS['test_r2']:.1%}")
         st.metric("Within ±15%", f"{INSIGHTS['within_15']:.1f}%")
     with col_b:
-        st.metric("Avg Error", f"R {INSIGHTS['test_rmse']:,.0f}")
+        st.metric("Avg Error", f"Ksh {INSIGHTS['test_rmse']:,.0f}")
         st.metric("Error Rate", f"{INSIGHTS['test_mape']:.1f}%")
     
     st.caption("Based on test set of 600+ listings")
