@@ -211,14 +211,43 @@ view = st.sidebar.checkbox("Ocean View", value=False)
 tub = st.sidebar.checkbox("Hot Tub", value=False)
 ib = st.sidebar.selectbox("Instant Book", ['No','Yes'])
 
+#Default coordinates (Cape Town center for legacy model compatibility) 
+DEFAULT_LATITUDE = -33.9249
+DEFAULT_LONGITUDE = 18.4241
+
+# Base inputs (without lat/lon)
 vals = dict(
-    property_type=pt, room_type=rt, neighbourhood=ngh, accommodates=accom,
-    bedrooms=bedr, beds=beds, bathrooms=bthr,
-    host_listings_count=hlc, host_acceptance_rate=har, hosting_years=hyrs,
-    host_is_superhost=sh, review_scores_rating=rsr, review_scores_location=rsl,
-    number_of_reviews=nrev, amenities_count=amen_ct, has_pool=pool,
-    has_bbq_grill=bbq, has_ocean_view=view, has_hot_tub=tub, instant_bookable=ib
+    property_type=pt,
+    room_type=rt,
+    neighbourhood=ngh,
+    accommodates=accom,
+    bedrooms=bedr,
+    beds=beds,
+    bathrooms=bthr,
+    host_listings_count=hlc,
+    host_acceptance_rate=har,
+    hosting_years=hyrs,
+    host_is_superhost=sh,
+    review_scores_rating=rsr,
+    review_scores_location=rsl,
+    number_of_reviews=nrev,
+    amenities_count=amen_ct,
+    has_pool=pool,
+    has_bbq_grill=bbq,
+    has_ocean_view=view,
+    has_hot_tub=tub,
+    instant_bookable=ib
 )
+
+# Only add lat/lon if the model actually needs them
+try:
+    expected = expected_features(model)
+except Exception:
+    expected = UI_FEATURES  # fallback if model lacks feature_names_in_
+
+if 'latitude' in expected and 'longitude' in expected:
+    vals['latitude'] = DEFAULT_LATITUDE
+    vals['longitude'] = DEFAULT_LONGITUDE
 
 
 # Main actions
